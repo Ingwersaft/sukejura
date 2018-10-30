@@ -17,7 +17,7 @@ sealed class MonthsOfYear {
 }
 
 fun Set<MonthsOfYear>.isActive(monthValue: Int): Boolean {
-    val anyMisses = map {
+    val matches = map {
         when (it) {
             MonthsOfYear.Every -> true
             MonthsOfYear.Jan -> monthValue == 1
@@ -33,6 +33,10 @@ fun Set<MonthsOfYear>.isActive(monthValue: Int): Boolean {
             MonthsOfYear.Nov -> monthValue == 11
             MonthsOfYear.Dec -> monthValue == 12
         }
-    }.any { !it }
-    return anyMisses.not()
+    }
+    return if (matches.isEmpty()) {
+        true
+    } else {
+        matches.any { it }
+    }
 }
