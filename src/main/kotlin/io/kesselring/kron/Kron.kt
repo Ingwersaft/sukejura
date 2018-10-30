@@ -40,6 +40,7 @@ class Kron : CoroutineScope {
         exec = block
     }
 
+    internal var started = false
     fun start(): Kron {
         launch(
             context = dispatcher
@@ -60,14 +61,21 @@ class Kron : CoroutineScope {
                 delay(50)
             }
         }
+        started = true
         println("launched")
         return this
     }
 
-    private fun active(nowMinute: LocalDateTime): Boolean {
-        val minutesActive = minutes.isActive(nowMinute.minute)
-        val hoursActive = hours.isActive(nowMinute.minute)
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    internal fun active(nowMinute: LocalDateTime): Boolean = nowMinute.let {
+        val minutesActive = minutes.isActive(it.minute)
+        val hoursActive = hours.isActive(it.minute)
+        val monthsOfYearActive = monthsOfYear.isActive(it.monthValue)
+        val daysOfMonthActive = daysOfMonth.isActive(it)
+        val daysOfWeekActive = daysOfWeek.isActive(it.dayOfWeek)
+        listOf(minutesActive, hoursActive, monthsOfYearActive, daysOfMonthActive, daysOfWeekActive)
+            .all {
+                true
+            }
     }
 
     fun stop() {
@@ -75,6 +83,11 @@ class Kron : CoroutineScope {
     }
 }
 
+
+fun Kron.getNextInvocations(amount: Int): List<LocalDateTime> {
+    if (started.not()) throw IllegalStateException("not started yet")
+    TODO()
+}
 
 fun main(args: Array<String>) {
     System.setProperty(DEBUG_PROPERTY_NAME, "on")

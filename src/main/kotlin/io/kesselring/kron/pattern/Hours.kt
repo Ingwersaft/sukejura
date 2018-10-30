@@ -27,6 +27,5 @@ fun Set<Hours>.isActive(hour: Int): Boolean {
             is Hours.H -> listOf(it.value)
         }
     }.flatten()
-    println("checking hour:$hour with $map")
     return map.contains(hour)
 }
