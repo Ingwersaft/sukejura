@@ -4,7 +4,9 @@ import io.kesselring.kron.pattern.*
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class TimeTest {
@@ -42,6 +44,8 @@ class TimeTest {
         setOf<DaysOfMonth>().isActive(d29) assert true // empty == every aka default
 
         setOf<DaysOfMonth>().isActive(febDay("22", "2018")) assert true
+
+        setOf<DaysOfMonth>().isActive(LocalDateTime.of(LocalDate.of(2019, 2, 28), LocalTime.of(15, 11))) assert true
     }
 
     private fun febDay(d: String, y: String = "2011") =
@@ -75,6 +79,6 @@ class TimeTest {
     }
 }
 
-private infix fun Boolean.assert(b: Boolean) {
+infix fun Boolean.assert(b: Boolean) {
     assertTrue(this == b)
 }

@@ -1,6 +1,8 @@
 package io.kesselring.kron.pattern
 
 import java.time.LocalDateTime
+import java.time.Month
+import java.time.Year
 
 sealed class DaysOfMonth {
     /**
@@ -20,12 +22,23 @@ sealed class DaysOfMonth {
 
 fun Set<DaysOfMonth>.isActive(currentTime: LocalDateTime): Boolean {
     // this should handle an empty set aswell
-    val anyFailed = map {
+    val matches = map {
         when (it) {
             is DaysOfMonth.Every -> true
             is DaysOfMonth.D -> currentTime.dayOfMonth == it.value
-            is DaysOfMonth.Last -> currentTime.dayOfMonth == currentTime.month.maxLength()
+            is DaysOfMonth.Last -> {
+                when {
+                    Year.isLeap(currentTime.year.toLong()) && currentTime.month.value == Month.FEBRUARY.value -> {
+                        currentTime.dayOfMonth == 29
+                    }
+                    else -> currentTime.dayOfMonth == 28
+                }
+            }
         }
-    }.any { !it }
-    return anyFailed.not()
+    }
+    return if (matches.isEmpty()) {
+        true
+    } else {
+        matches.any { it }
+    }
 }

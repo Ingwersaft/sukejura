@@ -5,15 +5,16 @@ import kotlinx.coroutines.*
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
+@Dsl
 fun kron(block: Kron.() -> Unit): Kron {
     val kron = Kron()
     kron.block()
     return kron
 }
 
+@Dsl
 class Kron : CoroutineScope {
     private val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     private val job = Job()
@@ -28,19 +29,64 @@ class Kron : CoroutineScope {
 
     private var exec: suspend (LocalDateTime) -> Unit = { throw IllegalStateException("no task block has been setup") }
 
+    @Dsl
     fun minute(block: () -> Minutes) {
         minutes.add(block())
     }
 
+    @Dsl
     fun minutes(block: () -> List<Minutes>) {
         minutes.addAll(block())
     }
 
+    @Dsl
+    fun hour(block: () -> Hours) {
+        hours.add(block())
+    }
+
+    @Dsl
+    fun hours(block: () -> List<Hours>) {
+        hours.addAll(block())
+    }
+
+    @Dsl
+    fun dayOfMonth(block: () -> DaysOfMonth) {
+        daysOfMonth.add(block())
+    }
+
+    @Dsl
+    fun daysOfMonth(block: () -> List<DaysOfMonth>) {
+        daysOfMonth.addAll(block())
+    }
+
+    @Dsl
+    fun dayOfWeek(block: () -> DaysOfWeek) {
+        daysOfWeek.add(block())
+    }
+
+    @Dsl
+    fun daysOfWeek(block: () -> List<DaysOfWeek>) {
+        daysOfWeek.addAll(block())
+    }
+
+    @Dsl
+    fun monthOfYear(block: () -> MonthsOfYear) {
+        monthsOfYear.add(block())
+    }
+
+    @Dsl
+    fun monthsOfYear(block: () -> List<MonthsOfYear>) {
+        monthsOfYear.addAll(block())
+    }
+
+    @Dsl
     fun task(block: suspend (LocalDateTime) -> Unit) {
         exec = block
     }
 
     internal var started = false
+
+    @Dsl
     fun start(): Kron {
         launch(
             context = dispatcher
@@ -68,13 +114,17 @@ class Kron : CoroutineScope {
 
     internal fun active(nowMinute: LocalDateTime): Boolean = nowMinute.let {
         val minutesActive = minutes.isActive(it.minute)
-        val hoursActive = hours.isActive(it.minute)
+        val hoursActive = hours.isActive(it.hour)
         val monthsOfYearActive = monthsOfYear.isActive(it.monthValue)
         val daysOfMonthActive = daysOfMonth.isActive(it)
         val daysOfWeekActive = daysOfWeek.isActive(it.dayOfWeek)
+//        println(
+//            "nowMinute=$nowMinute ## minutesActive=$minutesActive hoursActive=$hoursActive monthsOfYearActive=$monthsOfYearActive " +
+//                    "daysOfMonthActive=$daysOfMonthActive daysOfWeekActive=$daysOfWeekActive"
+//        )
         listOf(minutesActive, hoursActive, monthsOfYearActive, daysOfMonthActive, daysOfWeekActive)
             .all {
-                true
+                it
             }
     }
 
@@ -83,29 +133,40 @@ class Kron : CoroutineScope {
     }
 }
 
-
-fun Kron.getNextInvocations(amount: Int): List<LocalDateTime> {
-    if (started.not()) throw IllegalStateException("not started yet")
-    TODO()
+fun Kron.invocations(): Sequence<LocalDateTime> = sequence {
+    var current = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
+    while (true) {
+        if (active(current)) {
+            yield(current)
+        }
+        current = current.plusMinutes(1)
+    }
 }
+
+@DslMarker
+annotation class Dsl
 
 fun main(args: Array<String>) {
     System.setProperty(DEBUG_PROPERTY_NAME, "on")
     val kron = kron {
-        minute { Minutes.Every }
-        minutes {
-            listOf(
-                Minutes.M(10),
-                Minutes.M(11)
-            )
+        minute {
+            Minutes.M(11)
         }
-        task { println("running something") }
-    }.start()
-    println("now going to sleep 3 minutes")
-    Thread.sleep(TimeUnit.MINUTES.toMillis(2))
-    println("stopping kron")
-    kron.stop()
+        dayOfMonth { DaysOfMonth.Last }
+        monthOfYear { MonthsOfYear.Feb }
+        hour { Hours.H(15) }
 
-    Thread.sleep(TimeUnit.MINUTES.toMillis(2))
-    println("hopefully kron stopped")
+        task { println("running something") }
+    }
+    val invocations = kron.invocations()
+    invocations.take(20).forEach {
+        println("active: $it")
+    }
+//    println("now going to sleep 3 minutes")
+//    Thread.sleep(TimeUnit.MINUTES.toMillis(2))
+//    println("stopping kron")
+//    kron.stop()
+//
+//    Thread.sleep(TimeUnit.MINUTES.toMillis(2))
+//    println("hopefully kron stopped")
 }
