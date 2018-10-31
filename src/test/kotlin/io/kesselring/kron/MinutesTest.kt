@@ -25,11 +25,12 @@ class MinutesTest {
             Minutes.M(10),
             Minutes.M(11)
         )
-        while (true) {
-            println(givenTime)
-            println(underTest.isActive(givenTime.minute))
-            println()
-            givenTime = givenTime.plusMinutes(1)
-        }
+
+        underTest.isActive(8) assert false
+        underTest.isActive(9) assert false
+        underTest.isActive(10) assert true
+        underTest.isActive(11) assert true
+        underTest.isActive(12) assert false
+        underTest.isActive(13) assert false
     }
 }
