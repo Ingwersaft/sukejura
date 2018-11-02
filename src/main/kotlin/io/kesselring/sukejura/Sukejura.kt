@@ -2,6 +2,7 @@ package io.kesselring.sukejura
 
 import io.kesselring.sukejura.pattern.*
 import kotlinx.coroutines.*
+import java.time.Clock
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.Executors
@@ -28,7 +29,7 @@ class Sukejura : CoroutineScope {
     private val daysOfWeek: MutableSet<DaysOfWeek> = mutableSetOf()
 
     private var exec: suspend (LocalDateTime) -> Unit = { throw IllegalStateException("no task block has been setup") }
-
+    internal var clock = Clock.systemDefaultZone()
     @Dsl
     fun minute(block: () -> Minutes) {
         minutes.add(block())
@@ -94,7 +95,7 @@ class Sukejura : CoroutineScope {
         ) {
             var lastCheck: LocalDateTime? = null
             while (true) {
-                val nowMinute = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
+                val nowMinute = LocalDateTime.now(clock).truncatedTo(ChronoUnit.MINUTES)
                 if (lastCheck == nowMinute) {
                     // already handled $nowMinute
                 } else {
@@ -131,42 +132,18 @@ class Sukejura : CoroutineScope {
     fun stop() {
         job.cancel()
     }
-}
 
-fun Sukejura.invocations(): Sequence<LocalDateTime> = sequence {
-    var current = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
-    while (true) {
-        if (active(current)) {
-            yield(current)
+    fun invocations(): Sequence<LocalDateTime> = sequence {
+        var current = LocalDateTime.now(clock).truncatedTo(ChronoUnit.MINUTES)
+        while (true) {
+            if (active(current)) {
+                yield(current)
+            }
+            current = current.plusMinutes(1)
         }
-        current = current.plusMinutes(1)
     }
 }
+
 
 @DslMarker
 annotation class Dsl
-
-fun main(args: Array<String>) {
-    System.setProperty(DEBUG_PROPERTY_NAME, "on")
-    val sukejura = sukejura {
-        minute {
-            Minutes.M(11)
-        }
-        dayOfMonth { DaysOfMonth.Last }
-        monthOfYear { MonthsOfYear.Feb }
-        hour { Hours.H(15) }
-
-        task { println("running something") }
-    }
-    val invocations = sukejura.invocations()
-    invocations.take(20).forEach {
-        println("active: $it")
-    }
-//    println("now going to sleep 3 minutes")
-//    Thread.sleep(TimeUnit.MINUTES.toMillis(2))
-//    println("stopping sukejura")
-//    sukejura.stop()
-//
-//    Thread.sleep(TimeUnit.MINUTES.toMillis(2))
-//    println("hopefully sukejura stopped")
-}
