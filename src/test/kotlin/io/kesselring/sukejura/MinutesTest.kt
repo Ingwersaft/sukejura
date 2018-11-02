@@ -1,7 +1,8 @@
-package io.kesselring.kron
+package io.kesselring.sukejura
 
-import io.kesselring.kron.pattern.Minutes
-import io.kesselring.kron.pattern.isActive
+import io.kesselring.sukejura.pattern.Minutes
+import io.kesselring.sukejura.pattern.isActive
+import io.kesselring.sukejura.assert
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime

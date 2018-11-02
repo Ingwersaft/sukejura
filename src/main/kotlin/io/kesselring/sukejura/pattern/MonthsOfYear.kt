@@ -1,4 +1,4 @@
-package io.kesselring.kron.pattern
+package io.kesselring.sukejura.pattern
 
 sealed class MonthsOfYear {
     object Every : MonthsOfYear()

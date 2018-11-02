@@ -4,7 +4,7 @@ plugins {
     kotlin("jvm") version "1.3.0"
 }
 
-group = "io.kesselring.kron"
+group = "io.kesselring.sukejura"
 version = "1.0.0-SNAPSHOT"
 
 repositories {

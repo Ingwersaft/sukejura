@@ -1,4 +1,4 @@
-package io.kesselring.kron.pattern
+package io.kesselring.sukejura.pattern
 
 import java.time.LocalDateTime
 import java.time.Month

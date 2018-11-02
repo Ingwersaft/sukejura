@@ -1,7 +1,8 @@
-package io.kesselring.kron
+package io.kesselring.sukejura
 
-import io.kesselring.kron.pattern.DaysOfMonth
-import io.kesselring.kron.pattern.isActive
+import io.kesselring.sukejura.pattern.DaysOfMonth
+import io.kesselring.sukejura.pattern.isActive
+import io.kesselring.sukejura.assert
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime

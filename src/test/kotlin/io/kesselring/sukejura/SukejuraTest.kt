@@ -1,19 +1,19 @@
-package io.kesselring.kron
+package io.kesselring.sukejura
 
-import io.kesselring.kron.pattern.DaysOfMonth
-import io.kesselring.kron.pattern.Hours
-import io.kesselring.kron.pattern.Minutes
-import io.kesselring.kron.pattern.MonthsOfYear
+import io.kesselring.sukejura.pattern.DaysOfMonth
+import io.kesselring.sukejura.pattern.Hours
+import io.kesselring.sukejura.pattern.Minutes
+import io.kesselring.sukejura.pattern.MonthsOfYear
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
-class KronTest {
+class SukejuraTest {
     @Test
     fun testLeapYears() {
-        val kron = kron {
+        val sukejura = sukejura {
             minute {
                 // only on minute 11
                 Minutes.M(11)
@@ -24,7 +24,7 @@ class KronTest {
 
             task { println("running something") }
         }
-        val invocations = kron.invocations().take(5).toSet()
+        val invocations = sukejura.invocations().take(5).toSet()
         val expectedTime = LocalTime.of(15, 11)
         assertEquals(
             invocations, setOf(

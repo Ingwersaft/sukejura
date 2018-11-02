@@ -1,6 +1,6 @@
-package io.kesselring.kron
+package io.kesselring.sukejura
 
-import io.kesselring.kron.pattern.Hours
+import io.kesselring.sukejura.pattern.Hours
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 

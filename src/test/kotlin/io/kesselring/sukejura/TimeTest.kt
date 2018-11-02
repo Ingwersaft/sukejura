@@ -1,6 +1,6 @@
-package io.kesselring.kron
+package io.kesselring.sukejura
 
-import io.kesselring.kron.pattern.*
+import io.kesselring.sukejura.pattern.*
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.DayOfWeek

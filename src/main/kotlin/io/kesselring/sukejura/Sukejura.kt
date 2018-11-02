@@ -1,6 +1,6 @@
-package io.kesselring.kron
+package io.kesselring.sukejura
 
-import io.kesselring.kron.pattern.*
+import io.kesselring.sukejura.pattern.*
 import kotlinx.coroutines.*
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -8,18 +8,18 @@ import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
 @Dsl
-fun kron(block: Kron.() -> Unit): Kron {
-    val kron = Kron()
-    kron.block()
-    return kron
+fun sukejura(block: Sukejura.() -> Unit): Sukejura {
+    val sukejura = Sukejura()
+    sukejura.block()
+    return sukejura
 }
 
 @Dsl
-class Kron : CoroutineScope {
+class Sukejura : CoroutineScope {
     private val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     private val job = Job()
     override val coroutineContext: CoroutineContext
-        get() = job + dispatcher//newSingleThreadContext("kron-context")
+        get() = job + dispatcher//newSingleThreadContext("sukejura-context")
 
     private val minutes: MutableSet<Minutes> = mutableSetOf()
     private val hours: MutableSet<Hours> = mutableSetOf()
@@ -87,10 +87,10 @@ class Kron : CoroutineScope {
     internal var started = false
 
     @Dsl
-    fun start(): Kron {
+    fun start(): Sukejura {
         launch(
             context = dispatcher
-            //newSingleThreadContext("kron-background-timer")
+            //newSingleThreadContext("sukejura-background-timer")
         ) {
             var lastCheck: LocalDateTime? = null
             while (true) {
@@ -133,7 +133,7 @@ class Kron : CoroutineScope {
     }
 }
 
-fun Kron.invocations(): Sequence<LocalDateTime> = sequence {
+fun Sukejura.invocations(): Sequence<LocalDateTime> = sequence {
     var current = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
     while (true) {
         if (active(current)) {
@@ -148,7 +148,7 @@ annotation class Dsl
 
 fun main(args: Array<String>) {
     System.setProperty(DEBUG_PROPERTY_NAME, "on")
-    val kron = kron {
+    val sukejura = sukejura {
         minute {
             Minutes.M(11)
         }
@@ -158,15 +158,15 @@ fun main(args: Array<String>) {
 
         task { println("running something") }
     }
-    val invocations = kron.invocations()
+    val invocations = sukejura.invocations()
     invocations.take(20).forEach {
         println("active: $it")
     }
 //    println("now going to sleep 3 minutes")
 //    Thread.sleep(TimeUnit.MINUTES.toMillis(2))
-//    println("stopping kron")
-//    kron.stop()
+//    println("stopping sukejura")
+//    sukejura.stop()
 //
 //    Thread.sleep(TimeUnit.MINUTES.toMillis(2))
-//    println("hopefully kron stopped")
+//    println("hopefully sukejura stopped")
 }
