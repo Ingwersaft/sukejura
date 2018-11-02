@@ -7,9 +7,11 @@ plugins {
 group = "io.kesselring.sukejura"
 version = "1.0.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-    jcenter()
+allprojects {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
 }
 
 dependencies {
