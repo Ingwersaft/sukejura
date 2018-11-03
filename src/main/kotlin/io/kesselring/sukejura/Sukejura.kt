@@ -1,5 +1,6 @@
 package io.kesselring.sukejura
 
+import com.sun.org.apache.xpath.internal.operations.Bool
 import io.kesselring.sukejura.pattern.*
 import kotlinx.coroutines.*
 import java.time.Clock
@@ -85,6 +86,13 @@ class Sukejura : CoroutineScope {
         exec = block
     }
 
+    @Dsl
+    fun skipInitialExecution() {
+        skipInitialExecution = true
+    }
+
+    private var skipInitialExecution = false
+    private var isInitialExecution = true
     internal var started = false
 
     @Dsl
@@ -100,29 +108,32 @@ class Sukejura : CoroutineScope {
                     // already handled $nowMinute
                 } else {
                     lastCheck = nowMinute
-                    println("new minute $nowMinute, going to check if we should execute now")
-                    if (active(nowMinute)) {
-                        exec(nowMinute)
+                    if (active(nowMinute) && skip().not()) {
+                        try {
+                            exec(nowMinute)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                        if (isInitialExecution) {
+                            isInitialExecution = false
+                        }
                     }
                 }
                 delay(50)
             }
         }
         started = true
-        println("launched")
         return this
     }
 
-    internal fun active(nowMinute: LocalDateTime): Boolean = nowMinute.let {
+    private fun skip(): Boolean = (isInitialExecution && skipInitialExecution).also { isInitialExecution = false }
+
+    private fun active(nowMinute: LocalDateTime): Boolean = nowMinute.let {
         val minutesActive = minutes.isActive(it.minute)
         val hoursActive = hours.isActive(it.hour)
         val monthsOfYearActive = monthsOfYear.isActive(it.monthValue)
         val daysOfMonthActive = daysOfMonth.isActive(it)
         val daysOfWeekActive = daysOfWeek.isActive(it.dayOfWeek)
-//        println(
-//            "nowMinute=$nowMinute ## minutesActive=$minutesActive hoursActive=$hoursActive monthsOfYearActive=$monthsOfYearActive " +
-//                    "daysOfMonthActive=$daysOfMonthActive daysOfWeekActive=$daysOfWeekActive"
-//        )
         listOf(minutesActive, hoursActive, monthsOfYearActive, daysOfMonthActive, daysOfWeekActive)
             .all {
                 it
