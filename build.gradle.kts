@@ -1,4 +1,5 @@
 import com.jfrog.bintray.gradle.BintrayExtension
+import groovy.lang.Closure
 import groovy.util.Node
 import net.researchgate.release.BaseScmAdapter
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -50,9 +51,9 @@ publishing {
             from(components["java"])
             artifact(sourcesJar.get())
             pom.withXml {
-                asNode().appendNode("dependencies").let { depNode ->
+                asNode().get("dependencies").delegateClosureOf<Node> {
                     configurations.compile.allDependencies.forEach {
-                        depNode.appendNode("dependency").apply {
+                        appendNode("dependency").apply {
                             appendNode("groupId", it.group)
                             appendNode("artifactId", it.name)
                             appendNode("version", it.version)
@@ -65,11 +66,15 @@ publishing {
         }
     }
 }
+release {
+
+}
 fun findProperty(s: String) = project.findProperty(s) as String?
 bintray {
     user = findProperty("bintrayUser")
     key = findProperty("bintrayApiKey")
     publish = true
+    dryRun = false
     setPublications(findProperty("publicationName"))
     pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
         repo = "Sukejura"
@@ -83,5 +88,8 @@ bintray {
         setLabels("kotlin", "cron", "scheduling", "schedule", "sukejura", "coroutines", "tasks")
         setLicenses("MIT")
         desc = description
+        version(delegateClosureOf<BintrayExtension.VersionConfig> {
+            name = findProperty("version")!!
+        })
     })
 }
