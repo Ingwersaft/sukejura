@@ -1,3 +1,5 @@
+[ ![Download](https://api.bintray.com/packages/ingwersaft/Sukejura/Sukejura/images/download.svg) ](https://bintray.com/ingwersaft/Sukejura/Sukejura/_latestVersion)
+
 # Sukejura
 **cron-like library for kotlin** - coroutine based
 
