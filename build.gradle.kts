@@ -45,6 +45,10 @@ tasks.withType(Test::class.java) {
 
 tasks.findByPath("build")?.finalizedBy(sourcesJar)
 
+release {
+    buildTasks = listOf("build", "bintrayPublish", "bintrayUpload")
+}
+
 publishing {
     publications.invoke {
         register(findProperty("publicationName")!!, MavenPublication::class) {
