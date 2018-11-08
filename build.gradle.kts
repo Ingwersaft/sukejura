@@ -1,11 +1,15 @@
+import com.jfrog.bintray.gradle.BintrayExtension
+import groovy.util.Node
+import net.researchgate.release.BaseScmAdapter
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.3.0"
+    id("net.researchgate.release") version "2.7.0"
+    id("com.jfrog.bintray") version "1.8.4"
+    `maven-publish`
 }
-
 group = "io.kesselring.sukejura"
-version = "1.0.0-SNAPSHOT"
 
 allprojects {
     repositories {
@@ -28,4 +32,56 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+val sourcesJar by tasks.registering(Jar::class) {
+    classifier = "sources"
+    from(sourceSets["main"].allSource)
+}
+tasks.withType(Test::class.java) {
+    testLogging.showStandardStreams = true
+}
+
+tasks.findByPath("build")?.finalizedBy(sourcesJar)
+
+publishing {
+    publications.invoke {
+        register(findProperty("publicationName")!!, MavenPublication::class) {
+            from(components["java"])
+            artifact(sourcesJar.get())
+            pom.withXml {
+                asNode().appendNode("dependencies").let { depNode ->
+                    configurations.compile.allDependencies.forEach {
+                        depNode.appendNode("dependency").apply {
+                            appendNode("groupId", it.group)
+                            appendNode("artifactId", it.name)
+                            appendNode("version", it.version)
+                        }
+                    }
+                }
+            }
+            version = findProperty("version")
+            group = project.group
+        }
+    }
+}
+fun findProperty(s: String) = project.findProperty(s) as String?
+bintray {
+    user = findProperty("bintrayUser")
+    key = findProperty("bintrayApiKey")
+    publish = true
+    setPublications(findProperty("publicationName"))
+    pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
+        repo = "Sukejura"
+        name = "Sukejura"
+        userOrg = user
+        websiteUrl = "https://github.com/Ingwersaft/sukejura"
+        githubRepo = "https://github.com/Ingwersaft/sukejura"
+        vcsUrl = "https://github.com/Ingwersaft/sukejura.git"
+        issueTrackerUrl = "https://github.com/Ingwersaft/sukejura/issues"
+        description = "cron-like library for kotlin - coroutine based"
+        setLabels("kotlin", "cron", "scheduling", "schedule", "sukejura", "coroutines", "tasks")
+        setLicenses("MIT")
+        desc = description
+    })
 }
