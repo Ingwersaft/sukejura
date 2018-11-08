@@ -9,6 +9,9 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * create a new Sukejura instance
+ */
 @Dsl
 fun sukejura(block: Sukejura.() -> Unit): Sukejura {
     val sukejura = Sukejura()
@@ -16,17 +19,30 @@ fun sukejura(block: Sukejura.() -> Unit): Sukejura {
     return sukejura
 }
 
+/**
+ * Every Sukejura instance has it's own coroutine scope with a single thread executor as dispatcher.
+ * Use the dsl function to create an instance
+ */
 @Dsl
-class Sukejura : CoroutineScope {
+class Sukejura internal constructor() : CoroutineScope {
     private val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     private val job = Job()
-    override val coroutineContext: CoroutineContext
-        get() = job + dispatcher//newSingleThreadContext("sukejura-context")
 
+    override val coroutineContext: CoroutineContext
+        get() = job + dispatcher
+
+    /**
+     * Instance schedules. you can change schedules during runtime, e.g. change the task logic
+     * Use the schedule dsl function to create an instance
+     */
     val schedules: MutableList<Schedule> = mutableListOf()
     internal var clock = Clock.systemDefaultZone()
     private var started = false
 
+    /**
+     * create a new schedule
+     * @return the created schedule
+     */
     fun schedule(init: Schedule.() -> Unit): Schedule {
         val schedule = Schedule(clock).also {
             it.name = scheduleName().first()
@@ -36,10 +52,11 @@ class Sukejura : CoroutineScope {
         return schedule
     }
 
+    /**
+     * Start the Sukejura timer logic
+     */
     fun start(): Sukejura {
-        launch(
-            context = dispatcher
-        ) {
+        launch {
             var lastCheck: LocalDateTime? = null
             while (true) {
                 val nowMinute = LocalDateTime.now(clock).truncatedTo(ChronoUnit.MINUTES)
@@ -73,6 +90,9 @@ class Sukejura : CoroutineScope {
     }
 
 
+    /**
+     * Stop Sukejura
+     */
     fun stop() {
         job.cancel()
     }
@@ -85,9 +105,14 @@ class Sukejura : CoroutineScope {
     }
 }
 
+/**
+ * Schedule contains the time config and the task to be executed.
+ * Use the schedule dsl function to create an instance
+ */
 @Dsl
-class Schedule(private val clock: Clock) {
-    internal var exec: suspend (LocalDateTime) -> Unit = { throw IllegalStateException("no task block has been setup") }
+class Schedule internal constructor(private val clock: Clock) {
+    internal var exec: suspend (LocalDateTime) -> Unit =
+        { throw IllegalStateException("no task block has been provided") }
     private val minutes: MutableSet<Minutes> = mutableSetOf()
     private val hours: MutableSet<Hours> = mutableSetOf()
     private val daysOfMonth: MutableSet<DaysOfMonth> = mutableSetOf()
@@ -162,6 +187,9 @@ class Schedule(private val clock: Clock) {
             }
     }
 
+    /**
+     * The next invocations as lazy sequence. Very helpful for checking your scheduling
+     */
     fun invocations(): Sequence<LocalDateTime> = sequence {
         var current = LocalDateTime.now(clock).truncatedTo(ChronoUnit.MINUTES)
         while (true) {
