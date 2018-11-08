@@ -5,12 +5,14 @@ import io.kesselring.sukejura.sukejura
 
 fun main(args: Array<String>) {
     sukejura {
-        dayOfMonth { DaysOfMonth.Last }
-        task {
-            println("byebye month")
-        }
-        invocations().take(10).forEach {
-            println(it)
+        schedule {
+            dayOfMonth { DaysOfMonth.Last }
+            task {
+                println("byebye month")
+            }
+            invocations().take(10).forEach {
+                println(it)
+            }
         }
         start()
     }

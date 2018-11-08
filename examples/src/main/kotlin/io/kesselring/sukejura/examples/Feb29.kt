@@ -8,18 +8,20 @@ import io.kesselring.sukejura.sukejura
 
 fun main(args: Array<String>) {
     sukejura {
-        monthOfYear { MonthsOfYear.Feb }
-        dayOfMonth {
-            DaysOfMonth.D(29)
-        }
-        minute { Minutes.M(0) }
-        hour { Hours.H(0) }
+        schedule {
+            monthOfYear { MonthsOfYear.Feb }
+            dayOfMonth {
+                DaysOfMonth.D(29)
+            }
+            minute { Minutes.M(0) }
+            hour { Hours.H(0) }
 
-        task {
-            println("hi")
+            task {
+                println("hi")
+            }
         }
         start()
-        invocations().take(10).forEach {
+        schedules.first().invocations().take(10).forEach {
             println("leap year at 0:0: $it")
         }
     }

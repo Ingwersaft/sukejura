@@ -9,7 +9,8 @@ Sukejura has minute-precision and supports:
  * DaysOfWeek
  * DaysOfMonth
  * MonthsOfYear
- 
+
+Sukejura also supports multiple schedules inside the same instance.
 
 ## basic example
 
@@ -88,3 +89,20 @@ Sukejura supports more than one schedule.
 ## about the name
 
 Sukejura or better: Sukejūra / スケジューラ means scheduler in english
+
+## Patterns
+
+Every even Minute:
+```kotlin
+minutes { (0..59 step 2).map { Minutes.M(it) } }
+```
+
+Last Day of February 00:00; only leap years:
+```kotlin
+monthOfYear { MonthsOfYear.Feb }
+dayOfMonth {
+    DaysOfMonth.D(29)
+}
+minute { Minutes.M(0) }
+hour { Hours.H(0) }
+```
