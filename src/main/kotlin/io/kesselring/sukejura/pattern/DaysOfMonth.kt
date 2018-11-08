@@ -1,9 +1,11 @@
 package io.kesselring.sukejura.pattern
 
+import io.kesselring.sukejura.Dsl
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.Year
 
+@Dsl
 sealed class DaysOfMonth {
     /**
      * @param value 1-31 possible

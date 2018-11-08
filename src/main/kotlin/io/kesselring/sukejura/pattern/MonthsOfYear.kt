@@ -1,5 +1,8 @@
 package io.kesselring.sukejura.pattern
 
+import io.kesselring.sukejura.Dsl
+
+@Dsl
 sealed class MonthsOfYear {
     object Every : MonthsOfYear()
     object Jan : MonthsOfYear()

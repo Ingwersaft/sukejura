@@ -15,34 +15,36 @@ Sukejura has minute-precision and supports:
 
 ```kotlin
     val sukejura = sukejura {
-        // every working day of the week
-        daysOfWeek {
-            listOf(
-                DaysOfWeek.Mon,
-                DaysOfWeek.Tue,
-                DaysOfWeek.Wed,
-                DaysOfWeek.Thu,
-                DaysOfWeek.Fri
-            )
-        }
-        // at 9am and 5pm
-        hours {
-            listOf(
-                Hours.H(9),
-                Hours.H(17)
-            )
-        }
-        // every time the minute is 0
-        minute { Minutes.M(0) }
-        task {
-            println("hello there!")
+        schedule {
+            // every working day of the week
+            daysOfWeek {
+                listOf(
+                    DaysOfWeek.Mon,
+                    DaysOfWeek.Tue,
+                    DaysOfWeek.Wed,
+                    DaysOfWeek.Thu,
+                    DaysOfWeek.Fri
+                )
+            }
+            // at 9am and 5pm
+            hours {
+                listOf(
+                    Hours.H(9),
+                    Hours.H(17)
+                )
+            }
+            // every time the minute is 0
+            minute { Minutes.M(0) }
+            task {
+                println("hello there!")
+            }
         }
         start()
     }
-    sukejura.invocations().take(20).forEach {
+    sukejura.schedules.first().invocations().take(20).forEach {
         println("triggering at: $it")
     }
-    
+
 // triggering at: 2018-11-05T09:00
 // triggering at: 2018-11-05T17:00
 // triggering at: 2018-11-06T09:00
@@ -62,7 +64,7 @@ Sukejura has minute-precision and supports:
 // triggering at: 2018-11-15T09:00
 // triggering at: 2018-11-15T17:00
 // triggering at: 2018-11-16T09:00
-// triggering at: 2018-11-16T17:00    
+// triggering at: 2018-11-16T17:00
 ```
 
 For more examples see the examples [subproject](tree/master/examples)
@@ -71,13 +73,18 @@ For more examples see the examples [subproject](tree/master/examples)
 ### default values
 Default value for every configuration type is `every time`, so creating Sukejura without any
 config will result in a task executed every minute.
+### Parallelism
+Internally, Sukejura uses a single Thread for as dispatcher. 
+If you use multiple schedules, the tasks will be executed effectively sequential.
+However, if you do non-blocking suspension in your task, you shouldn't have any problems.
 ### Time tracking
 Sukejura only keeps track of the last truncated minute the task has been executed at.
 This means:
  * Initial execution won't wait for a full minute (use `skipInitialExecution()` if you want it to wait)
  * If a task execution needs more time than one interval, 
  executions might be skipped (task won't run in parallel)
-
+### multiple schedules
+Sukejura supports more than one schedule. 
 ## about the name
 
 Sukejura or better: Sukejūra / スケジューラ means scheduler in english

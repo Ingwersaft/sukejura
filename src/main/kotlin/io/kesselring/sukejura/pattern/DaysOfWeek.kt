@@ -1,7 +1,9 @@
 package io.kesselring.sukejura.pattern
 
+import io.kesselring.sukejura.Dsl
 import java.time.DayOfWeek
 
+@Dsl
 sealed class DaysOfWeek {
     object Every : DaysOfWeek()
     object Mon : DaysOfWeek()

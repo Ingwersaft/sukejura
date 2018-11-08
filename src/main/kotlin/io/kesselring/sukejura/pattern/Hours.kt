@@ -1,5 +1,8 @@
 package io.kesselring.sukejura.pattern
 
+import io.kesselring.sukejura.Dsl
+
+@Dsl
 sealed class Hours {
     /**
      * @param value only 0 to 23 is valid

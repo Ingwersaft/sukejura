@@ -1,5 +1,8 @@
 package io.kesselring.sukejura.pattern
 
+import io.kesselring.sukejura.Dsl
+
+@Dsl
 sealed class Minutes {
     /**
      * @param value only 0 to 59 is valid
