@@ -64,14 +64,22 @@ publishing {
                         }
                     }
                 }
+                asNode().apply {
+                    appendNode("name", "Sukejura")
+                    appendNode("url", "https://github.com/Ingwersaft/sukejura")
+                    appendNode("licenses").apply {
+                        appendNode("license").apply {
+                            appendNode("name", "MIT License")
+                            appendNode("url", "https://github.com/Ingwersaft/sukejura/blob/master/LICENSE")
+                            appendNode("distribution", "repo")
+                        }
+                    }
+                }
             }
             version = findProperty("version")
             group = project.group
         }
     }
-}
-release {
-
 }
 fun findProperty(s: String) = project.findProperty(s) as String?
 bintray {
