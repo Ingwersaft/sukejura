@@ -76,6 +76,7 @@ publishing {
                     }
                 }
             }
+            artifactId = "Sukejura"
             version = findProperty("version")
             group = project.group
         }
