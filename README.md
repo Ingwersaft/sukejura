@@ -72,6 +72,37 @@ Sukejura also supports multiple schedules inside the same instance.
 
 For more examples see the examples [subproject](tree/master/examples)
 
+## How to get Sukejura
+Sukejura is published at [jcenter](https://bintray.com/ingwersaft/Sukejura/Sukejura).
+### Gradle
+```groovy
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+...
+dependencies {
+    compile 'io.kesselring.sukejura:Sukejura:<version>'
+}
+```
+### Maven
+```xml
+<repositories>
+    <repository>
+        <id>central</id>
+        <name>bintray</name>
+        <url>https://jcenter.bintray.com</url>
+    </repository>
+</repositories>
+...
+<dependency>
+    <groupId>io.kesselring.sukejura</groupId>
+    <artifactId>Sukejura</artifactId>
+    <version>#version#</version>
+</dependency>
+```
+
 ## Behaviour
 ### default values
 Default value for every configuration type is `every time`, so creating Sukejura without any
