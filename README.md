@@ -1,4 +1,6 @@
 [ ![Download](https://api.bintray.com/packages/ingwersaft/Sukejura/Sukejura/images/download.svg) ](https://bintray.com/ingwersaft/Sukejura/Sukejura/_latestVersion)
+[![CircleCI](https://circleci.com/gh/Ingwersaft/sukejura/tree/master.svg?style=svg)](https://circleci.com/gh/Ingwersaft/sukejura/tree/master)
+[![codecov](https://codecov.io/gh/Ingwersaft/sukejura/branch/master/graph/badge.svg)](https://codecov.io/gh/Ingwersaft/sukejura)
 
 # Sukejura
 **cron-like library for kotlin** - coroutine based
