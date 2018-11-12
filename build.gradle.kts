@@ -9,6 +9,7 @@ plugins {
     id("net.researchgate.release") version "2.7.0"
     id("com.jfrog.bintray") version "1.8.4"
     `maven-publish`
+    `jacoco`
 }
 group = "io.kesselring.sukejura"
 
@@ -16,6 +17,14 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
+    }
+}
+tasks {
+    getByName<JacocoReport>("jacocoTestReport") {
+        reports {
+            xml.isEnabled = true
+            xml.destination = file("$buildDir/reports/jacoco/report.xml")
+        }
     }
 }
 
