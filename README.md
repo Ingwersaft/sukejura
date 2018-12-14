@@ -127,9 +127,13 @@ Sukejura or better: Sukejūra / スケジューラ means scheduler in english
 
 ## Patterns
 
-Every even Minute:
+Every even minute:
 ```kotlin
 minutes { (0..59 step 2).map { Minutes.M(it) } }
+```
+Every 5 minutes:
+```
+minutes { (0..59 step 5).map { Minutes.M(it) } }
 ```
 
 Last Day of February 00:00; only leap years:
